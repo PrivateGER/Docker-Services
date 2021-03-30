@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  grafana: 
+    restart: always
+    image: grafana/grafana
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,marcusolsson-hourly-heatmap-panel"
+      GF_DASHBOARDS_MIN_REFRESH_INTERVAL: "500ms"
+    ports:
+    - "127.0.0.1:3456:3000"
+    volumes:
+    - "grafana-storage:/var/lib/grafana"
+
+  loki:
+    restart: always
+    image: grafana/loki:2.0.0
+    ports:
+      - "127.0.0.1:3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    restart: always
+    image: grafana/promtail:2.0.0
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+
+  bitwarden:
+    restart: always
+    image: bitwardenrs/server:testing
+    ports:
+    - "127.0.0.1:6464:80"
+    volumes:
+    - "./data/bitwardenrsdata:/data/:rw"  
+    environment:
+      ADMIN_TOKEN: ""
+      domain_set: "true"
+      domain_origin: "http://DOMAIN"
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+    networks:
+    - bitwarden_net
+
+volumes:
+  grafana-storage:
+networks:
+  default:
+    name: docker_services
+  bitwarden_net:
