@@ -4,6 +4,7 @@
 
 ## Bitwarden
 ADMIN_TOKEN: Populate with `openssl rand -base64 64`
+
 domain_origin: Set to base domain
 
 ## Grafana
@@ -19,4 +20,5 @@ GF_DASHBOARDS_MIN_REFRESH_INTERVAL: minimum global refresh rate
 
 # Network
 Default network is `docker_services`, with all containers but bitwarden_rs connected to it.
+
 Use a reverse proxy (for example nginx) to make locally listening services public.
